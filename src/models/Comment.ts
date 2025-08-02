@@ -1,3 +1,4 @@
+// src/models/Comment.ts
 import { Model, DataTypes, Sequelize, Optional } from 'sequelize';
 import { createRequire } from 'module';
 
@@ -26,12 +27,13 @@ export type CommentCreationAttributes = Optional<CommentAttributes, 'id' | 'crea
  * broadcast in real time to other clients.
  */
 export class Comment extends Model<CommentAttributes, CommentCreationAttributes> implements CommentAttributes {
-  public id!: number;
-  public noteId!: number;
-  public author!: string;
-  public content!: string;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  // Declare fields to avoid shadowing Sequelize getters/setters
+  declare id: number;
+  declare noteId: number;
+  declare author: string;
+  declare content: string;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
 
   /**
    * Initialize the Comment model. This method should be called during
@@ -45,36 +47,44 @@ export class Comment extends Model<CommentAttributes, CommentCreationAttributes>
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
-          primaryKey: true
+          primaryKey: true,
         },
         noteId: {
           type: DataTypes.INTEGER,
-          allowNull: false
+          allowNull: false,
         },
         author: {
           type: DataTypes.STRING(64),
-          allowNull: false
+          allowNull: false,
         },
         content: {
           type: DataTypes.TEXT,
-          allowNull: false
+          allowNull: false,
         },
         createdAt: {
           type: DataTypes.DATE,
           get() {
-            return formatInTimeZone(this.getDataValue('createdAt'), 'Etc/GMT-3', "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-          }
+            return formatInTimeZone(
+              this.getDataValue('createdAt'),
+              'Etc/GMT-3',
+              "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+            );
+          },
         },
         updatedAt: {
           type: DataTypes.DATE,
           get() {
-            return formatInTimeZone(this.getDataValue('updatedAt'), 'Etc/GMT-3', "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-          }
-        }
+            return formatInTimeZone(
+              this.getDataValue('updatedAt'),
+              'Etc/GMT-3',
+              "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+            );
+          },
+        },
       },
       {
         sequelize,
-        tableName: 'comments'
+        tableName: 'comments',
       }
     );
     return Comment;

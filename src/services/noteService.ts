@@ -1,6 +1,6 @@
+// src/services/noteService.ts
 import { Op, Transaction } from 'sequelize';
-import sequelize from '../config/database.js';
-import { Note, NoteCreationAttributes, NoteAttributes } from '../models/Note.js';
+import { Note } from '../models/Note.js';
 
 /**
  * Service encapsulating business logic for managing notes. Separating
@@ -17,7 +17,6 @@ export class NoteService {
    * @returns A promise resolving to the created note
    */
   async createNote(boardId: string, content: string): Promise<Note> {
-    // Determine the next order by finding the current maximum.
     const max = await Note.max('order', { where: { boardId } });
     const nextOrder = typeof max === 'number' ? max + 1 : 0;
     return Note.create({ boardId, content, order: nextOrder });
@@ -92,23 +91,28 @@ export class NoteService {
    * @param direction Direction to move the note (up|down|top|bottom)
    * @returns A promise resolving to the updated note or null if not found
    */
-  async moveNote(id: number, direction: 'up' | 'down' | 'top' | 'bottom'): Promise<Note | null> {
-    return sequelize.transaction(async (t: Transaction) => {
+  async moveNote(
+    id: number,
+    direction: 'up' | 'down' | 'top' | 'bottom'
+  ): Promise<Note | null> {
+    return Note.sequelize!.transaction(async (t: Transaction) => {
       const note = await Note.findByPk(id, { transaction: t });
       if (!note) return null;
       // Retrieve all notes on the same board sorted by order.
       const notes = await Note.findAll({
         where: { boardId: note.boardId },
         order: [['order', 'ASC']],
-        transaction: t
+        transaction: t,
       });
       const idx = notes.findIndex(n => n.id === note.id);
       if (idx === -1) return null;
+
       // Helper to update order and persist.
-      const updateOrder = async (targetNote: Note, newOrder: number) => {
-        targetNote.order = newOrder;
-        await targetNote.save({ transaction: t });
+      const updateOrder = async (target: Note, newOrder: number) => {
+        target.order = newOrder;
+        await target.save({ transaction: t });
       };
+
       switch (direction) {
         case 'up': {
           if (idx === 0) {
@@ -157,6 +161,7 @@ export class NoteService {
           // Unknown direction
           return note;
       }
+
       return note;
     });
   }

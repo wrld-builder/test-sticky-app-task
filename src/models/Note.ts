@@ -1,3 +1,4 @@
+// src/models/Note.ts
 import { Model, DataTypes, Sequelize, Optional } from 'sequelize';
 import { createRequire } from 'module';
 
@@ -28,12 +29,13 @@ export type NoteCreationAttributes = Optional<NoteAttributes, 'id' | 'createdAt'
  * a floating‑point number to allow easy repositioning between notes.
  */
 export class Note extends Model<NoteAttributes, NoteCreationAttributes> implements NoteAttributes {
-  public id!: number;
-  public boardId!: string;
-  public content!: string;
-  public order!: number;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  // Declare fields to avoid shadowing Sequelize getters/setters
+  declare id: number;
+  declare boardId: string;
+  declare content: string;
+  declare order: number;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
 
   /**
    * Initializes the Note model. This should be called exactly once as part
@@ -49,40 +51,47 @@ export class Note extends Model<NoteAttributes, NoteCreationAttributes> implemen
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
-          primaryKey: true
+          primaryKey: true,
         },
         boardId: {
           type: DataTypes.STRING,
-          allowNull: false
+          allowNull: false,
         },
         content: {
           type: DataTypes.STRING(255),
-          allowNull: false
+          allowNull: false,
         },
         order: {
           type: DataTypes.FLOAT,
           allowNull: false,
-          unique: true
+          unique: true,
         },
         createdAt: {
           type: DataTypes.DATE,
           get() {
-            return formatInTimeZone(this.getDataValue('createdAt'), 'Etc/GMT-3', "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-          }
+            return formatInTimeZone(
+              this.getDataValue('createdAt'),
+              'Etc/GMT-3',
+              "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+            );
+          },
         },
         updatedAt: {
           type: DataTypes.DATE,
           get() {
-            return formatInTimeZone(this.getDataValue('updatedAt'), 'Etc/GMT-3', "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-          }
-        }
+            return formatInTimeZone(
+              this.getDataValue('updatedAt'),
+              'Etc/GMT-3',
+              "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+            );
+          },
+        },
       },
       {
         sequelize,
-        tableName: 'notes'
+        tableName: 'notes',
       }
     );
-
     return Note;
   }
 }
