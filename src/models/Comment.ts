@@ -43,12 +43,12 @@ export class Comment extends Model<CommentAttributes, CommentCreationAttributes>
     Comment.init(
       {
         id: {
-          type: DataTypes.INTEGER.UNSIGNED,
+          type: DataTypes.INTEGER,
           autoIncrement: true,
           primaryKey: true
         },
         noteId: {
-          type: DataTypes.INTEGER.UNSIGNED,
+          type: DataTypes.INTEGER,
           allowNull: false
         },
         author: {
