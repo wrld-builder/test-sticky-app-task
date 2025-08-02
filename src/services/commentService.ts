@@ -9,7 +9,7 @@ class CommentService {
   async getComments(userId: number, noteId: number): Promise<Comment[]> {
     return Comment.findAll({
       where: { author: userId, noteId },
-      order: [['createdAt', 'ASC']]
+      order: [['createdAt', 'ASC']],
     });
   }
 

@@ -15,7 +15,7 @@ describe('NoteService', () => {
     // Создаём тестового пользователя
     const user = await User.create({
       username: 'testuser',
-      passwordHash: 'dummy-hash'
+      passwordHash: 'dummy-hash',
     });
     userId = user.id;
   });
@@ -41,7 +41,7 @@ describe('NoteService', () => {
     await service.createNote(userId, 'board-2', 'Third');
 
     const notes = await service.getNotes(userId, 'board-2');
-    expect(notes.map(n => n.content)).toEqual(['First', 'Second', 'Third']);
+    expect(notes.map((n) => n.content)).toEqual(['First', 'Second', 'Third']);
   });
 
   it('updates a note', async () => {

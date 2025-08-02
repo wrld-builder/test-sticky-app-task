@@ -28,7 +28,7 @@ router
   .route('/:id')
   .put(async (req: AuthenticatedRequest, res: Response) => {
     const noteId = Number(req.params.noteId);
-    const id     = Number(req.params.id);
+    const id = Number(req.params.id);
     const { content } = req.body;
     if (isNaN(noteId) || isNaN(id) || typeof content !== 'string') {
       return res.status(400).json({ error: 'Invalid parameters' });
@@ -39,7 +39,7 @@ router
   })
   .delete(async (req: AuthenticatedRequest, res: Response) => {
     const noteId = Number(req.params.noteId);
-    const id     = Number(req.params.id);
+    const id = Number(req.params.id);
     if (isNaN(noteId) || isNaN(id)) {
       return res.status(400).json({ error: 'Invalid parameters' });
     }

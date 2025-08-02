@@ -28,8 +28,8 @@ export const sequelize = isTest
       host: DB_HOST,
       port: parseInt(DB_PORT, 10),
       dialect: 'postgres',
-      logging: false,           // отключаем логирование SQL
-      ssl: DB_SSL === 'true',   // включаем SSL, если задано в env
+      logging: false, // отключаем логирование SQL
+      ssl: DB_SSL === 'true', // включаем SSL, если задано в env
     });
 
 export default sequelize;

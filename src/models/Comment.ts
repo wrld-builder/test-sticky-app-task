@@ -12,9 +12,15 @@ export interface CommentAttributes {
   createdAt?: Date;
   updatedAt?: Date;
 }
-export type CommentCreationAttributes = Optional<CommentAttributes, 'id' | 'createdAt' | 'updatedAt'>;
+export type CommentCreationAttributes = Optional<
+  CommentAttributes,
+  'id' | 'createdAt' | 'updatedAt'
+>;
 
-export class Comment extends Model<CommentAttributes, CommentCreationAttributes> implements CommentAttributes {
+export class Comment
+  extends Model<CommentAttributes, CommentCreationAttributes>
+  implements CommentAttributes
+{
   declare id: number;
   declare noteId: number;
   declare author: number;
@@ -28,19 +34,19 @@ export class Comment extends Model<CommentAttributes, CommentCreationAttributes>
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
-          primaryKey: true
+          primaryKey: true,
         },
         noteId: {
           type: DataTypes.INTEGER,
-          allowNull: false
+          allowNull: false,
         },
         author: {
           type: DataTypes.INTEGER,
-          allowNull: false
+          allowNull: false,
         },
         content: {
           type: DataTypes.TEXT,
-          allowNull: false
+          allowNull: false,
         },
         createdAt: {
           type: DataTypes.DATE,
@@ -50,7 +56,7 @@ export class Comment extends Model<CommentAttributes, CommentCreationAttributes>
               'Etc/GMT-3',
               "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
             );
-          }
+          },
         },
         updatedAt: {
           type: DataTypes.DATE,
@@ -60,12 +66,12 @@ export class Comment extends Model<CommentAttributes, CommentCreationAttributes>
               'Etc/GMT-3',
               "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
             );
-          }
-        }
+          },
+        },
       },
       {
         sequelize,
-        tableName: 'comments'
+        tableName: 'comments',
       }
     );
     return Comment;

@@ -54,7 +54,7 @@ router.delete('/:id', async (req: AuthenticatedRequest, res: Response) => {
 router.post('/:id/move', async (req: AuthenticatedRequest, res: Response) => {
   const id = Number(req.params.id);
   const { direction } = req.body;
-  if (isNaN(id) || !['up','down','top','bottom'].includes(direction)) {
+  if (isNaN(id) || !['up', 'down', 'top', 'bottom'].includes(direction)) {
     return res.status(400).json({ error: 'Invalid parameters' });
   }
   const moved = await noteService.moveNote(req.user.userId, id, direction);

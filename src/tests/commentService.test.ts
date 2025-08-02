@@ -16,7 +16,7 @@ describe('CommentService', () => {
     // Создаём пользователя
     const user = await User.create({
       username: 'commenter',
-      passwordHash: 'dummy'
+      passwordHash: 'dummy',
     });
     userId = user.id;
   });

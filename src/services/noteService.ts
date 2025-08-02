@@ -72,9 +72,7 @@ class NoteService {
           if (idx > 0) {
             const prev = notes[idx - 1];
             const beforePrev = idx - 2 >= 0 ? notes[idx - 2] : null;
-            const newOrder = beforePrev
-              ? (prev.order + beforePrev.order) / 2
-              : prev.order - 1;
+            const newOrder = beforePrev ? (prev.order + beforePrev.order) / 2 : prev.order - 1;
             await updateOrder(note, newOrder);
           }
           break;
@@ -83,9 +81,7 @@ class NoteService {
           if (idx < notes.length - 1) {
             const next = notes[idx + 1];
             const afterNext = idx + 2 < notes.length ? notes[idx + 2] : null;
-            const newOrder = afterNext
-              ? (next.order + afterNext.order) / 2
-              : next.order + 1;
+            const newOrder = afterNext ? (next.order + afterNext.order) / 2 : next.order + 1;
             await updateOrder(note, newOrder);
           }
           break;

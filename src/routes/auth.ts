@@ -20,7 +20,7 @@ router.post('/signup', async (req, res) => {
     const token = signToken({ userId: user.id, username: user.username });
     return res.status(201).json({
       token,
-      user: { id: user.id, username: user.username }
+      user: { id: user.id, username: user.username },
     });
   } catch (err: any) {
     return res.status(400).json({ message: err.message });
@@ -44,7 +44,7 @@ router.post('/login', async (req, res) => {
     const token = signToken({ userId: user.id, username: user.username });
     return res.json({
       token,
-      user: { id: user.id, username: user.username }
+      user: { id: user.id, username: user.username },
     });
   } catch {
     return res.status(500).json({ message: 'Authentication failed' });

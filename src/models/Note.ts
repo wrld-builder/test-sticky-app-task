@@ -23,10 +23,7 @@ export type NoteCreationAttributes = Optional<NoteAttributes, 'id' | 'createdAt'
 /**
  * Модель Note — отдельная заметка пользователя на доске.
  */
-export class Note
-  extends Model<NoteAttributes, NoteCreationAttributes>
-  implements NoteAttributes
-{
+export class Note extends Model<NoteAttributes, NoteCreationAttributes> implements NoteAttributes {
   declare id: number;
   declare userId: number;
   declare boardId: string;

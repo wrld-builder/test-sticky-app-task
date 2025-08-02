@@ -13,11 +13,11 @@ export function initModels(): void {
   User.initModel(sequelize);
 
   // Пользователь — заметки
-  User.hasMany(Note,   { foreignKey: 'userId', as: 'notes' });
+  User.hasMany(Note, { foreignKey: 'userId', as: 'notes' });
   Note.belongsTo(User, { foreignKey: 'userId', as: 'author' });
 
   // Заметка — комментарии
-  Note.hasMany(Comment,   { foreignKey: 'noteId', as: 'comments', onDelete: 'CASCADE' });
+  Note.hasMany(Comment, { foreignKey: 'noteId', as: 'comments', onDelete: 'CASCADE' });
   Comment.belongsTo(Note, { foreignKey: 'noteId', as: 'note' });
 }
 
