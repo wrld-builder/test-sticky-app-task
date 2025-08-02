@@ -1,4 +1,8 @@
 import { Model, DataTypes, Sequelize, Optional } from 'sequelize';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const { formatInTimeZone } = require('date-fns-tz');
 
 /**
  * Attributes for a comment attached to a sticky note. Each comment belongs
@@ -55,8 +59,18 @@ export class Comment extends Model<CommentAttributes, CommentCreationAttributes>
           type: DataTypes.TEXT,
           allowNull: false
         },
-        createdAt: DataTypes.DATE,
-        updatedAt: DataTypes.DATE
+        createdAt: {
+          type: DataTypes.DATE,
+          get() {
+            return formatInTimeZone(this.getDataValue('createdAt'), 'Etc/GMT-3', "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+          }
+        },
+        updatedAt: {
+          type: DataTypes.DATE,
+          get() {
+            return formatInTimeZone(this.getDataValue('updatedAt'), 'Etc/GMT-3', "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+          }
+        }
       },
       {
         sequelize,
