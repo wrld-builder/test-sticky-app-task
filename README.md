@@ -25,16 +25,6 @@
    GRANT ALL PRIVILEGES ON DATABASE sticky TO sticky_user;
    ```
 
-   Либо поднимите готовый сервер через Docker:
-
-   ```bash
-   docker run -d -p 5432:5432 \
-     -e POSTGRES_DB=sticky \
-     -e POSTGRES_USER=sticky_user \
-     -e POSTGRES_PASSWORD=secret \
-     postgres:15
-   ```
-
 4. **Настройте переменные окружения**. Создайте файл `.env` в корне со следующими параметрами:
 
    ```env
