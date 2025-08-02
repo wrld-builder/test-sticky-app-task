@@ -2,34 +2,52 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 
-// Загружаем переменные окружения из .env, если есть
+// Подгружаем переменные окружения из .env
 dotenv.config();
 
 const {
-  DB_HOST = 'localhost',
+  NODE_ENV = 'development',
+  DB_HOST,
   DB_PORT = '5432',
-  DB_USER = 'wrld-builder',
-  DB_PASSWORD = '666',
-  DB_NAME = 'sticky',
+  DB_USER,
+  DB_PASSWORD,
+  DB_NAME,
   DB_SSL = 'false',
-  NODE_ENV = '',
+  DB_LOGGING = 'false',
 } = process.env;
 
-// При запуске в режиме тестов (Vitest устанавливает NODE_ENV='test')
-// используем SQLite в памяти, чтобы каждый тест жил в чистой БД.
 const isTest = NODE_ENV === 'test';
+const logging = DB_LOGGING === 'true' ? console.log : false;
 
-export const sequelize = isTest
-  ? new Sequelize('sqlite::memory:', {
-      // отключаем логирование для чистоты тестов
-      logging: false,
-    })
-  : new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+let sequelize: Sequelize;
+
+if (isTest) {
+  // При запуске тестов используем in-memory SQLite
+  sequelize = new Sequelize('sqlite::memory:', { logging });
+} else {
+  if (!DB_HOST || !DB_USER || !DB_PASSWORD || !DB_NAME) {
+    throw new Error('Не заданы необходимые переменные окружения для подключения к БД');
+  }
+  sequelize = new Sequelize(
+    DB_NAME,
+    DB_USER,
+    DB_PASSWORD,
+    {
       host: DB_HOST,
       port: parseInt(DB_PORT, 10),
       dialect: 'postgres',
-      logging: false, // отключаем логирование SQL
-      ssl: DB_SSL === 'true', // включаем SSL, если задано в env
-    });
+      logging,
+      dialectOptions: DB_SSL === 'true'
+        ? {
+            ssl: {
+              require: true,
+              rejectUnauthorized: false, // разрешить self-signed сертификаты
+            },
+          }
+        : {},
+    }
+  );
+}
 
 export default sequelize;
+export { sequelize };
