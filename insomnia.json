@@ -1,0 +1,238 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-08-02T00:00:00.000Z",
+  "resources": [
+    {
+      "_id": "wrk_sticky",
+      "_type": "workspace",
+      "name": "Sticky Notes API",
+      "description": "Collection of requests for testing the sticky notes backend"
+    },
+    {
+      "_id": "env_sticky",
+      "_type": "environment",
+      "parentId": "wrk_sticky",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "token": ""
+      },
+      "color": null
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_sticky",
+      "name": "Authentication",
+      "description": "User signup and login"
+    },
+    {
+      "_id": "req_signup",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Signup",
+      "description": "Register a new user",
+      "method": "POST",
+      "url": "{{ base_url }}/api/v1/auth/signup",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"username\": \"alice\",\n  \"password\": \"secret\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Login",
+      "description": "Authenticate an existing user",
+      "method": "POST",
+      "url": "{{ base_url }}/api/v1/auth/login",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"username\": \"alice\",\n  \"password\": \"secret\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "fld_notes",
+      "_type": "request_group",
+      "parentId": "wrk_sticky",
+      "name": "Notes",
+      "description": "CRUD operations for notes"
+    },
+    {
+      "_id": "req_get_notes",
+      "_type": "request",
+      "parentId": "fld_notes",
+      "name": "List notes",
+      "method": "GET",
+      "url": "{{ base_url }}/api/v1/notes?boardId=board-1",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_create_note",
+      "_type": "request",
+      "parentId": "fld_notes",
+      "name": "Create note",
+      "method": "POST",
+      "url": "{{ base_url }}/api/v1/notes",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"boardId\": \"board-1\",\n  \"content\": \"Hello world\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_update_note",
+      "_type": "request",
+      "parentId": "fld_notes",
+      "name": "Update note",
+      "method": "PUT",
+      "url": "{{ base_url }}/api/v1/notes/1",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"content\": \"Updated content\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_move_note",
+      "_type": "request",
+      "parentId": "fld_notes",
+      "name": "Move note up",
+      "method": "POST",
+      "url": "{{ base_url }}/api/v1/notes/1/move",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"direction\": \"up\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_delete_note",
+      "_type": "request",
+      "parentId": "fld_notes",
+      "name": "Delete note",
+      "method": "DELETE",
+      "url": "{{ base_url }}/api/v1/notes/1",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "fld_comments",
+      "_type": "request_group",
+      "parentId": "wrk_sticky",
+      "name": "Comments",
+      "description": "Manage comments on notes"
+    },
+    {
+      "_id": "req_create_comment",
+      "_type": "request",
+      "parentId": "fld_comments",
+      "name": "Create comment",
+      "method": "POST",
+      "url": "{{ base_url }}/api/v1/notes/1/comments",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"content\": \"Nice idea!\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_update_comment",
+      "_type": "request",
+      "parentId": "fld_comments",
+      "name": "Update comment",
+      "method": "PUT",
+      "url": "{{ base_url }}/api/v1/notes/1/comments/1",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"content\": \"Updated comment\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_delete_comment",
+      "_type": "request",
+      "parentId": "fld_comments",
+      "name": "Delete comment",
+      "method": "DELETE",
+      "url": "{{ base_url }}/api/v1/notes/1/comments/1",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "body": {}
+    }
+  ]
+}

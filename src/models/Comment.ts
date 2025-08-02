@@ -1,0 +1,68 @@
+import { Model, DataTypes, Sequelize, Optional } from 'sequelize';
+
+/**
+ * Attributes for a comment attached to a sticky note. Each comment belongs
+ * to a single note (`noteId`) and stores the author's name along with
+ * content. The timestamps are managed automatically by Sequelize.
+ */
+export interface CommentAttributes {
+  id: number;
+  noteId: number;
+  author: string;
+  content: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export type CommentCreationAttributes = Optional<CommentAttributes, 'id' | 'createdAt' | 'updatedAt'>;
+
+/**
+ * The Comment model represents a small piece of discussion attached to a
+ * note. Comments can only be created by authenticated users and are
+ * broadcast in real time to other clients.
+ */
+export class Comment extends Model<CommentAttributes, CommentCreationAttributes> implements CommentAttributes {
+  public id!: number;
+  public noteId!: number;
+  public author!: string;
+  public content!: string;
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+
+  /**
+   * Initialize the Comment model. This method should be called during
+   * application startup after the Sequelize connection has been created.
+   *
+   * @param sequelize A Sequelize connection instance.
+   */
+  public static initModel(sequelize: Sequelize): typeof Comment {
+    Comment.init(
+      {
+        id: {
+          type: DataTypes.INTEGER.UNSIGNED,
+          autoIncrement: true,
+          primaryKey: true
+        },
+        noteId: {
+          type: DataTypes.INTEGER.UNSIGNED,
+          allowNull: false
+        },
+        author: {
+          type: DataTypes.STRING(64),
+          allowNull: false
+        },
+        content: {
+          type: DataTypes.TEXT,
+          allowNull: false
+        },
+        createdAt: DataTypes.DATE,
+        updatedAt: DataTypes.DATE
+      },
+      {
+        sequelize,
+        tableName: 'comments'
+      }
+    );
+    return Comment;
+  }
+}
