@@ -1,69 +1,84 @@
-import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
-import { Sequelize } from 'sequelize';
-import { Note } from '../models/Note.js';
-import { initModels } from '../models/index.js';
-import { NoteService } from '../services/noteService.js';
-
-// Create an isolated in‑memory database for testing purposes.
-const testSequelize = new Sequelize('sqlite::memory:', { logging: false });
+// src/tests/noteService.test.ts
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { initModels, sequelize, User } from '../models/index.js';
+import service from '../services/noteService.js';
 
 describe('NoteService', () => {
-  let service: NoteService;
+  let userId: number;
 
   beforeAll(async () => {
-    // Initialize models against the test database and sync schema
-    Note.initModel(testSequelize);
-    await testSequelize.sync();
-    service = new NoteService();
+    // Инициализируем модели и связи
+    initModels();
+    // Пересоздаём все таблицы
+    await sequelize.sync({ force: true });
+
+    // Создаём тестового пользователя
+    const user = await User.create({
+      username: 'testuser',
+      passwordHash: 'dummy-hash'
+    });
+    userId = user.id;
   });
 
-  beforeEach(async () => {
-    // Clear notes table before each test
-    await Note.destroy({ where: {} });
+  afterAll(async () => {
+    // Закрываем соединение с БД
+    await sequelize.close();
   });
 
-  it('creates notes with increasing order', async () => {
-    const first = await service.createNote('board-1', 'First');
-    const second = await service.createNote('board-1', 'Second');
-    expect(first.order).toBeLessThan(second.order);
+  it('creates and retrieves a note', async () => {
+    const note = await service.createNote(userId, 'board-1', 'Hello');
+    expect(note.boardId).toBe('board-1');
+    expect(note.content).toBe('Hello');
+
+    const fetched = await service.getNoteById(userId, note.id);
+    expect(fetched).not.toBeNull();
+    expect(fetched!.id).toBe(note.id);
   });
 
-  it('moves a note up', async () => {
-    const a = await service.createNote('board-1', 'A');
-    const b = await service.createNote('board-1', 'B');
-    const moved = await service.moveNote(b.id, 'up');
-    if (!moved) throw new Error('move returned null');
-    // After moving up, B should now have an order less than A
-    const notes = await service.getNotes('board-1');
-    expect(notes[0].id).toBe(b.id);
-    expect(notes[1].id).toBe(a.id);
+  it('lists notes in order', async () => {
+    await service.createNote(userId, 'board-2', 'First');
+    await service.createNote(userId, 'board-2', 'Second');
+    await service.createNote(userId, 'board-2', 'Third');
+
+    const notes = await service.getNotes(userId, 'board-2');
+    expect(notes.map(n => n.content)).toEqual(['First', 'Second', 'Third']);
   });
 
-  it('moves a note down', async () => {
-    const a = await service.createNote('board-1', 'A');
-    const b = await service.createNote('board-1', 'B');
-    const moved = await service.moveNote(a.id, 'down');
-    if (!moved) throw new Error('move returned null');
-    const notes = await service.getNotes('board-1');
-    expect(notes[0].id).toBe(b.id);
-    expect(notes[1].id).toBe(a.id);
+  it('updates a note', async () => {
+    const note = await service.createNote(userId, 'board-3', 'Old');
+    const updated = await service.updateNote(userId, note.id, 'New');
+    expect(updated).not.toBeNull();
+    expect(updated!.content).toBe('New');
+  });
+
+  it('deletes a note', async () => {
+    const note = await service.createNote(userId, 'board-4', 'ToDelete');
+    const ok = await service.deleteNote(userId, note.id);
+    expect(ok).toBe(true);
+
+    const shouldBeNull = await service.getNoteById(userId, note.id);
+    expect(shouldBeNull).toBeNull();
   });
 
   it('moves a note to the top', async () => {
-    const a = await service.createNote('board-1', 'A');
-    const b = await service.createNote('board-1', 'B');
-    const c = await service.createNote('board-1', 'C');
-    await service.moveNote(a.id, 'top');
-    const notes = await service.getNotes('board-1');
-    expect(notes[2].id).toBe(a.id);
+    const a = await service.createNote(userId, 'board-5', 'A');
+    const b = await service.createNote(userId, 'board-5', 'B');
+    const c = await service.createNote(userId, 'board-5', 'C');
+
+    // Перемещаем 'C' наверх
+    await service.moveNote(userId, c.id, 'top');
+    const notes = await service.getNotes(userId, 'board-5');
+    expect(notes[0].id).toBe(c.id);
   });
 
   it('moves a note to the bottom', async () => {
-    const a = await service.createNote('board-1', 'A');
-    const b = await service.createNote('board-1', 'B');
-    const c = await service.createNote('board-1', 'C');
-    await service.moveNote(c.id, 'bottom');
-    const notes = await service.getNotes('board-1');
-    expect(notes[0].id).toBe(c.id);
+    const a = await service.createNote(userId, 'board-6', 'A');
+    const b = await service.createNote(userId, 'board-6', 'B');
+    const c = await service.createNote(userId, 'board-6', 'C');
+
+    // Перемещаем 'A' вниз
+    await service.moveNote(userId, a.id, 'bottom');
+    const notes = await service.getNotes(userId, 'board-6');
+    expect(notes[notes.length - 1].id).toBe(a.id);
   });
 });

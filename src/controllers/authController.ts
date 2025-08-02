@@ -1,30 +1,27 @@
+// src/controllers/authController.ts
 import { Router, Request, Response } from 'express';
-import { signIn, signUp } from '../auth/userService.js';
+import userService from '../services/userService.js';
 import { signToken } from '../middlewares/auth.js';
 
-/**
- * Router exposing authentication endpoints. These allow clients to
- * register and obtain JWTs for authenticated requests. Passwords are
- * hashed before storage.
- */
 const router = Router();
 
 /**
  * POST /auth/signup
  *
- * Create a new account. Requires unique `username` and non‑empty
- * `password`. Returns a JWT on success.
+ * Создаёт нового пользователя и возвращает JWT.
  */
 router.post('/signup', async (req: Request, res: Response) => {
   const { username, password } = req.body;
   if (typeof username !== 'string' || typeof password !== 'string') {
-    res.status(400).json({ message: 'username and password are required' });
-    return;
+    return res.status(400).json({ message: 'username and password are required' });
   }
+
   try {
-    const user = await signUp(username, password);
-    const token = signToken(user);
-    res.status(201).json({ token, user });
+    const user = await userService.createUser(username, password);
+    // В payload кладём только необходимые поля
+    const token = signToken({ id: user.id, username: user.username });
+    // Отдаём обратно только нужные данные
+    res.status(201).json({ token, user: { id: user.id, username: user.username } });
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }
@@ -33,21 +30,24 @@ router.post('/signup', async (req: Request, res: Response) => {
 /**
  * POST /auth/login
  *
- * Authenticate an existing user. Returns a JWT if credentials are valid.
+ * Проверяет учётные данные и возвращает JWT.
  */
 router.post('/login', async (req: Request, res: Response) => {
   const { username, password } = req.body;
   if (typeof username !== 'string' || typeof password !== 'string') {
-    res.status(400).json({ message: 'username and password are required' });
-    return;
+    return res.status(400).json({ message: 'username and password are required' });
   }
-  const user = await signIn(username, password);
-  if (!user) {
-    res.status(401).json({ message: 'Invalid credentials' });
-    return;
+
+  try {
+    const user = await userService.authenticate(username, password);
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+    const token = signToken({ id: user.id, username: user.username });
+    res.json({ token, user: { id: user.id, username: user.username } });
+  } catch (err: any) {
+    res.status(500).json({ message: 'Authentication failed' });
   }
-  const token = signToken(user);
-  res.json({ token, user });
 });
 
 export default router;

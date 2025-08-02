@@ -1,54 +1,61 @@
-import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
-import { Sequelize } from 'sequelize';
-import { Note } from '../models/Note.js';
-import { Comment } from '../models/Comment.js';
-import { CommentService } from '../services/commentService.js';
-import { NoteService } from '../services/noteService.js';
-
-// Use an in‑memory SQLite database
-const sequelize = new Sequelize('sqlite::memory:', { logging: false });
+import { describe, it, expect, beforeAll, beforeEach, afterAll } from 'vitest';
+import { initModels, sequelize, User, Note, Comment } from '../models/index.js';
+import noteService from '../services/noteService.js';
+import commentService from '../services/commentService.js';
 
 describe('CommentService', () => {
-  let commentService: CommentService;
-  let noteService: NoteService;
+  let userId: number;
   let noteId: number;
 
   beforeAll(async () => {
-    Note.initModel(sequelize);
-    Comment.initModel(sequelize);
-    // Establish association
-    Note.hasMany(Comment, { foreignKey: 'noteId', as: 'comments' });
-    Comment.belongsTo(Note, { foreignKey: 'noteId', as: 'note' });
-    await sequelize.sync();
-    commentService = new CommentService();
-    noteService = new NoteService();
+    // Инициализируем модели и связи
+    initModels();
+    // Синхронизируем базу заново
+    await sequelize.sync({ force: true });
+
+    // Создаём пользователя
+    const user = await User.create({
+      username: 'commenter',
+      passwordHash: 'dummy'
+    });
+    userId = user.id;
   });
 
   beforeEach(async () => {
+    // Очищаем комментарии и заметки
     await Comment.destroy({ where: {} });
     await Note.destroy({ where: {} });
-    const note = await noteService.createNote('board-1', 'Test note');
+
+    // Создаём новую заметку для тестов
+    const note = await noteService.createNote(userId, 'board-X', 'Test note');
     noteId = note.id;
   });
 
+  afterAll(async () => {
+    await sequelize.close();
+  });
+
   it('creates a comment for a note', async () => {
-    const comment = await commentService.createComment(noteId, 'alice', 'Hello');
+    const comment = await commentService.createComment(userId, noteId, 'Nice!');
+    expect(comment).toBeTruthy();
+    expect(comment.content).toBe('Nice!');
     expect(comment.noteId).toBe(noteId);
-    expect(comment.author).toBe('alice');
+    expect(comment.author).toBe(userId);
   });
 
   it('updates a comment', async () => {
-    const comment = await commentService.createComment(noteId, 'alice', 'Hello');
-    const updated = await commentService.updateComment(comment.id, 'Updated');
+    const comment = await commentService.createComment(userId, noteId, 'First');
+    const updated = await commentService.updateComment(userId, noteId, comment.id, 'Edited');
     expect(updated).not.toBeNull();
-    expect(updated!.content).toBe('Updated');
+    expect(updated!.content).toBe('Edited');
   });
 
   it('deletes a comment', async () => {
-    const comment = await commentService.createComment(noteId, 'alice', 'Hello');
-    const ok = await commentService.deleteComment(comment.id);
+    const comment = await commentService.createComment(userId, noteId, 'ToDelete');
+    const ok = await commentService.deleteComment(userId, noteId, comment.id);
     expect(ok).toBe(true);
-    const found = await Comment.findByPk(comment.id);
-    expect(found).toBeNull();
+    // Убедимся, что такого комментария больше нет
+    const still = await Comment.findByPk(comment.id);
+    expect(still).toBeNull();
   });
 });

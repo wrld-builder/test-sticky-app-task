@@ -83,6 +83,10 @@
         {
           "name": "Authorization",
           "value": "Bearer {{ token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
         }
       ],
       "body": {}
@@ -164,6 +168,10 @@
         {
           "name": "Authorization",
           "value": "Bearer {{ token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
         }
       ],
       "body": {}
@@ -230,6 +238,10 @@
         {
           "name": "Authorization",
           "value": "Bearer {{ token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
         }
       ],
       "body": {}

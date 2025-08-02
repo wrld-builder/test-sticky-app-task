@@ -1,14 +1,10 @@
+// src/config/database.ts
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 
-// Load environment variables from a .env file if present.
+// Загружаем переменные окружения из .env, если есть
 dotenv.config();
 
-/**
- * Initialize a single Sequelize instance for the application. By centralizing
- * configuration here, we avoid multiple connections and make the database
- * settings easy to override via environment variables.
- */
 const {
   DB_HOST = 'localhost',
   DB_PORT = '5432',
@@ -16,16 +12,24 @@ const {
   DB_PASSWORD = '666',
   DB_NAME = 'sticky',
   DB_SSL = 'false',
+  NODE_ENV = '',
 } = process.env;
 
-export const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
-  host: DB_HOST,
-  port: parseInt(DB_PORT, 10),
-  dialect: 'postgres',
-  // Disable logging in production to reduce noise; enable for debugging.
-  logging: false,
-  // Use SSL if explicitly enabled.
-  ssl: DB_SSL === 'true',
-});
+// При запуске в режиме тестов (Vitest устанавливает NODE_ENV='test')
+// используем SQLite в памяти, чтобы каждый тест жил в чистой БД.
+const isTest = NODE_ENV === 'test';
+
+export const sequelize = isTest
+  ? new Sequelize('sqlite::memory:', {
+      // отключаем логирование для чистоты тестов
+      logging: false,
+    })
+  : new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+      host: DB_HOST,
+      port: parseInt(DB_PORT, 10),
+      dialect: 'postgres',
+      logging: false,           // отключаем логирование SQL
+      ssl: DB_SSL === 'true',   // включаем SSL, если задано в env
+    });
 
 export default sequelize;
