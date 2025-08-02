@@ -21,8 +21,8 @@ let io: Server | null = null;
 export function initSocket(server: HttpServer): Server {
   io = new Server(server, {
     cors: {
-      origin: '*'
-    }
+      origin: '*',
+    },
   });
 
   io.on('connection', (socket: Socket) => {
@@ -43,10 +43,10 @@ export function initSocket(server: HttpServer): Server {
  * initialization.
  */
 export function getIO(): Server {
-    if (!io) {
-      throw new Error('Socket.io server not initialized');
-    }
-    return io;
+  if (!io) {
+    throw new Error('Socket.io server not initialized');
+  }
+  return io;
 }
 
 // ----- Event emission helpers -----

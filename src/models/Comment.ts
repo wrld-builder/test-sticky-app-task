@@ -19,14 +19,20 @@ export interface CommentAttributes {
   updatedAt?: Date;
 }
 
-export type CommentCreationAttributes = Optional<CommentAttributes, 'id' | 'createdAt' | 'updatedAt'>;
+export type CommentCreationAttributes = Optional<
+  CommentAttributes,
+  'id' | 'createdAt' | 'updatedAt'
+>;
 
 /**
  * The Comment model represents a small piece of discussion attached to a
  * note. Comments can only be created by authenticated users and are
  * broadcast in real time to other clients.
  */
-export class Comment extends Model<CommentAttributes, CommentCreationAttributes> implements CommentAttributes {
+export class Comment
+  extends Model<CommentAttributes, CommentCreationAttributes>
+  implements CommentAttributes
+{
   // Declare fields to avoid shadowing Sequelize getters/setters
   declare id: number;
   declare noteId: number;

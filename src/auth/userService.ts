@@ -24,8 +24,11 @@ let nextId = 1;
  * @param password Plain text password
  * @returns A promise resolving to the created user record
  */
-export async function signUp(username: string, password: string): Promise<Omit<UserRecord, 'passwordHash'>> {
-  const existing = users.find(u => u.username === username);
+export async function signUp(
+  username: string,
+  password: string
+): Promise<Omit<UserRecord, 'passwordHash'>> {
+  const existing = users.find((u) => u.username === username);
   if (existing) {
     throw new Error('Username already exists');
   }
@@ -33,7 +36,7 @@ export async function signUp(username: string, password: string): Promise<Omit<U
   const newUser: UserRecord = {
     id: nextId++,
     username,
-    passwordHash
+    passwordHash,
   };
   users.push(newUser);
   // Return public view of user without passwordHash
@@ -51,8 +54,11 @@ export async function signUp(username: string, password: string): Promise<Omit<U
  * @param password Plain text password to verify
  * @returns The user record if authentication succeeds, otherwise null
  */
-export async function signIn(username: string, password: string): Promise<Omit<UserRecord, 'passwordHash'> | null> {
-  const user = users.find(u => u.username === username);
+export async function signIn(
+  username: string,
+  password: string
+): Promise<Omit<UserRecord, 'passwordHash'> | null> {
+  const user = users.find((u) => u.username === username);
   if (!user) {
     return null;
   }

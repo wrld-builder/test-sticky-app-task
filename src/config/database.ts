@@ -15,7 +15,7 @@ const {
   DB_USER = 'wrld-builder',
   DB_PASSWORD = '666',
   DB_NAME = 'sticky',
-  DB_SSL = 'false'
+  DB_SSL = 'false',
 } = process.env;
 
 export const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
@@ -25,7 +25,7 @@ export const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   // Disable logging in production to reduce noise; enable for debugging.
   logging: false,
   // Use SSL if explicitly enabled.
-  ssl: DB_SSL === 'true'
+  ssl: DB_SSL === 'true',
 });
 
 export default sequelize;

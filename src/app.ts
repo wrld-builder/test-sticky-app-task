@@ -22,7 +22,7 @@ export function createApp() {
   sequelize
     .sync()
     .then(() => console.log('Database synced'))
-    .catch(err => {
+    .catch((err) => {
       console.error('DB sync failed:', err);
       process.exit(1);
     });

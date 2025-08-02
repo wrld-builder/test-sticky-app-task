@@ -91,10 +91,7 @@ export class NoteService {
    * @param direction Direction to move the note (up|down|top|bottom)
    * @returns A promise resolving to the updated note or null if not found
    */
-  async moveNote(
-    id: number,
-    direction: 'up' | 'down' | 'top' | 'bottom'
-  ): Promise<Note | null> {
+  async moveNote(id: number, direction: 'up' | 'down' | 'top' | 'bottom'): Promise<Note | null> {
     return Note.sequelize!.transaction(async (t: Transaction) => {
       const note = await Note.findByPk(id, { transaction: t });
       if (!note) return null;
@@ -104,7 +101,7 @@ export class NoteService {
         order: [['order', 'ASC']],
         transaction: t,
       });
-      const idx = notes.findIndex(n => n.id === note.id);
+      const idx = notes.findIndex((n) => n.id === note.id);
       if (idx === -1) return null;
 
       // Helper to update order and persist.

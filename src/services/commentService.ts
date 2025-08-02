@@ -15,11 +15,7 @@ export class CommentService {
    * @param content The comment body
    * @returns A promise resolving to the created comment
    */
-  async createComment(
-    noteId: number,
-    author: string,
-    content: string
-  ): Promise<Comment> {
+  async createComment(noteId: number, author: string, content: string): Promise<Comment> {
     return Comment.create({ noteId, author, content });
   }
 

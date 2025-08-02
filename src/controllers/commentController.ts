@@ -2,11 +2,7 @@ import { Router, Request, Response } from 'express';
 import { authenticate, AuthenticatedRequest } from '../middlewares/auth.js';
 import commentService from '../services/commentService.js';
 import noteService from '../services/noteService.js';
-import {
-  emitCommentCreated,
-  emitCommentUpdated,
-  emitCommentDeleted
-} from '../socket/index.js';
+import { emitCommentCreated, emitCommentUpdated, emitCommentDeleted } from '../socket/index.js';
 
 /**
  * Router handling CRUD operations for comments on notes. Authentication is

@@ -12,11 +12,10 @@ async function showAllNotes() {
       order: [['createdAt', 'DESC']],
     });
 
-    const plainNotes = notes.map(note => note.toJSON());
+    const plainNotes = notes.map((note) => note.toJSON());
 
     console.log('--- All Notes ---');
     console.log(JSON.stringify(plainNotes, null, 2));
-
   } catch (error) {
     console.error('Unable to connect to the database or fetch notes:', error);
   } finally {
